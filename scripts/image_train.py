@@ -15,9 +15,15 @@ from improved_diffusion.script_util import (
 )
 from improved_diffusion.train_util import TrainLoop
 
+import wandb
+import os
+wandb.init(project='diffusion', entity='ddpm')
 
 def main():
     args = create_argparser().parse_args()
+
+    print(vars(args))
+    wandb.config.update(args)
 
     dist_util.setup_dist()
     logger.configure()
