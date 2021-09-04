@@ -24,7 +24,11 @@ def main():
 
     print(vars(args))
     wandb.config.update(args)
-    os.environ("OPENAI_LOGDIR", wandb.run.dir)
+    os.environ["OPENAI_LOGDIR"] = wandb.run.dir
+
+    # synch checkpoints
+    wandb.save("*.pt")
+    wandb.save("*.csv")
 
     dist_util.setup_dist()
     logger.configure()
