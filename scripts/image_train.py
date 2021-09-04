@@ -24,6 +24,7 @@ def main():
 
     print(vars(args))
     wandb.config.update(args)
+    os.environ("OPENAI_LOGDIR", wandb.run.dir)
 
     dist_util.setup_dist()
     logger.configure()
