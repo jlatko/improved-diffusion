@@ -89,15 +89,17 @@ def main():
             all_labels.extend([labels.cpu().numpy() for labels in gathered_labels])
         logger.log(f"created {len(all_images) * args.batch_size} samples")
 
-    img_path = os.path.join(wandb.run.dir, 'images')
-    os.mkdir(img_path)
-    for i in range(min(16, len(all_images))):
-        img = Image.fromarray(all_images[i], 'RGB')
-        img.save(os.path.join(img_path, f'img_{i}.png'))
-        img.show()
 
     arr = np.concatenate(all_images, axis=0)
     arr = arr[: args.num_samples]
+
+    img_path = os.path.join(wandb.run.dir, 'images')
+    os.mkdir(img_path)
+    for i in range(min(100, args.num_samples)):
+        img = Image.fromarray(arr[i], 'RGB')
+        img.save(os.path.join(img_path, f'img_{i}.png'))
+        img.show()
+
     if args.class_cond:
         label_arr = np.concatenate(all_labels, axis=0)
         label_arr = label_arr[: args.num_samples]
