@@ -27,7 +27,7 @@ def download_checkpoints(run_id, step=-1, checkpoints=None):
             downloaded_checkpoints.append(checkpoint)
 
     return {
-        ckpt_type: f"./{run_id}/" + get_ckpt_type(ckpt_type, downloaded_checkpoints)
+        ckpt_type: f"./data/{run_id}/" + get_ckpt_type(ckpt_type, downloaded_checkpoints)
         for ckpt_type in ['ema', 'model', 'opt']
     }
 
@@ -49,6 +49,15 @@ def download_checkpoint(run_id, checkpoint, project="ddpm/diffusion"):
     files = run.files()
     for file in files:
         if file.name == checkpoint:
-            file.download(f"./{run_id}/", replace=True)  # TODO: maybe specify dir
+            file.download(f"./data/{run_id}/", replace=True)
             return
+
+def download_samples(run_id, project="ddpm/diffusion"):
+    api = wandb.Api()
+    run = api.run(f"{project}/{run_id}")
+    files = run.files()
+    for file in files:
+        if "samples" in file.name:
+            file.download(f"./data/{run_id}/", replace=True)
+            return f"./data/{run_id}/{file.name}"
 

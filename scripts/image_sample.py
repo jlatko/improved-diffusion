@@ -22,6 +22,8 @@ from improved_diffusion.wandb_util import download_checkpoints
 
 import wandb
 import os
+from PIL import Image
+
 
 
 wandb.init(project='diffusion', entity='ddpm')
@@ -38,6 +40,7 @@ def main():
             args.download_checkpoint,
             args.download_step
         )[args.resume_type]
+        print(args.model_path)
 
     dist_util.setup_dist()
     logger.configure()
@@ -85,6 +88,13 @@ def main():
             dist.all_gather(gathered_labels, classes)
             all_labels.extend([labels.cpu().numpy() for labels in gathered_labels])
         logger.log(f"created {len(all_images) * args.batch_size} samples")
+
+    img_path = os.path.join(wandb.run.dir, 'images')
+    os.mkdir(img_path)
+    for i in range(min(16, len(all_images))):
+        img = Image.fromarray(all_images[i], 'RGB')
+        img.save(os.path.join(img_path, f'img_{i}.png'))
+        img.show()
 
     arr = np.concatenate(all_images, axis=0)
     arr = arr[: args.num_samples]
