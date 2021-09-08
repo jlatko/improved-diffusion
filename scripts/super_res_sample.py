@@ -18,10 +18,24 @@ from improved_diffusion.script_util import (
     args_to_dict,
     add_dict_to_argparser,
 )
+from improved_diffusion.wandb_util import download_checkpoints
+
+import wandb
+import os
 
 
 def main():
     args = create_argparser().parse_args()
+
+    print(vars(args))
+    wandb.config.update(args)
+    os.environ["OPENAI_LOGDIR"] = wandb.run.dir
+
+    if args.download_checkpoint:
+        args.model_path = download_checkpoints(
+            args.download_checkpoint,
+            args.download_step
+        )[args.resume_type]
 
     dist_util.setup_dist()
     logger.configure()
@@ -106,6 +120,9 @@ def create_argparser():
         use_ddim=False,
         base_samples="",
         model_path="",
+        download_checkpoint="",
+        download_step=-1,
+        resume_type="ema"
     )
     defaults.update(sr_model_and_diffusion_defaults())
     parser = argparse.ArgumentParser()
