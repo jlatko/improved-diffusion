@@ -19,11 +19,12 @@ from improved_diffusion.wandb_util import download_checkpoints
 import wandb
 import os
 
+from scripts.image_nll import run_bpd_evaluation
 
-wandb.init(project='diffusion', entity='ddpm')
 
 def main():
     args = create_argparser().parse_args()
+    init_wandb(args)
 
     print(vars(args))
     wandb.config.update(args)
@@ -75,6 +76,20 @@ def main():
         weight_decay=args.weight_decay,
         lr_anneal_steps=args.lr_anneal_steps,
     ).run_loop()
+
+    logger.log("evaluating...")
+    data = load_data(
+        data_dir=args.data_dir,
+        batch_size=args.batch_size,
+        image_size=args.image_size,
+        class_cond=args.class_cond,
+        deterministic=True,
+    )
+    model.eval()
+    run_bpd_evaluation(model, diffusion, data, num_samples=100, clip_denoised=True)
+
+def init_wandb(args):
+    wandb.init(project='diffusion', entity='ddpm', tags=["openai","train"])
 
 
 def create_argparser():

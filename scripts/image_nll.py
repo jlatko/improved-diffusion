@@ -23,6 +23,7 @@ import os
 
 
 def main():
+    wandb.init(project='diffusion', entity='ddpm', tags=["openai","nll"])
     args = create_argparser().parse_args()
 
     print(vars(args))
@@ -72,11 +73,13 @@ def run_bpd_evaluation(model, diffusion, data, num_samples, clip_denoised):
         minibatch_metrics = diffusion.calc_bpd_loop(
             model, batch, clip_denoised=clip_denoised, model_kwargs=model_kwargs
         )
+        print(minibatch_metrics)
 
         for key, term_list in all_metrics.items():
             terms = minibatch_metrics[key].mean(dim=0) / dist.get_world_size()
             dist.all_reduce(terms)
             term_list.append(terms.detach().cpu().numpy())
+            wandb.log({key: term_list[-1]})
 
         total_bpd = minibatch_metrics["total_bpd"]
         total_bpd = total_bpd.mean() / dist.get_world_size()
