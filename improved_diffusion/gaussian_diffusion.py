@@ -676,8 +676,8 @@ class GaussianDiffusion:
         t = t[0].item()
         if t % 100 == 0:
             print('t', t)
-            print('true_log_variance_clipped', true_log_variance_clipped)
-            print('out["log_variance"]', out["log_variance"])
+            print('true_log_variance_clipped', true_log_variance_clipped[0][0][0])
+            print('out["log_variance"]', out["log_variance"], out["log_variance"][0][0][0])
         return {"output": output, "pred_xstart": out["pred_xstart"]}
 
     def training_losses(self, model, x_start, t, model_kwargs=None, noise=None):
