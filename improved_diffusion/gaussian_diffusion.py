@@ -678,7 +678,7 @@ class GaussianDiffusion:
             print('t', t)
             print('true_log_variance_clipped', true_log_variance_clipped)
             print('out["log_variance"]', out["log_variance"])
-            return {"output": output, "pred_xstart": out["pred_xstart"]}
+        return {"output": output, "pred_xstart": out["pred_xstart"]}
 
     def training_losses(self, model, x_start, t, model_kwargs=None, noise=None):
         """
