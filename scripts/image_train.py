@@ -89,7 +89,7 @@ def main():
     run_bpd_evaluation(model, diffusion, data, num_samples=100, clip_denoised=True)
 
 def init_wandb(args):
-    wandb.init(project='diffusion', entity='ddpm', tags=["openai","train"])
+    wandb.init(project='diffusion', entity='ddpm', tags=["openai","train"], dir="/scratch/diffusion")
 
 
 def create_argparser():

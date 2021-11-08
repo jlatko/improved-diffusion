@@ -23,7 +23,7 @@ import os
 
 
 def main():
-    wandb.init(project='diffusion', entity='ddpm', tags=["openai","nll"])
+    wandb.init(project='diffusion', entity='ddpm', tags=["openai","nll"], dir="/scratch/diffusion")
     args = create_argparser().parse_args()
 
     print(vars(args))

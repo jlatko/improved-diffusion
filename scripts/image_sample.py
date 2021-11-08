@@ -26,7 +26,7 @@ from PIL import Image
 
 
 
-wandb.init(project='diffusion', entity='ddpm')
+wandb.init(project='diffusion', entity='ddpm', dir="/scratch/diffusion")
 
 def main():
     args = create_argparser().parse_args()
