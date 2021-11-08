@@ -658,10 +658,10 @@ class GaussianDiffusion:
         out = self.p_mean_variance(
             model, x_t, t, clip_denoised=clip_denoised, model_kwargs=model_kwargs
         )
-        kl = normal_kl(
+        kl_full = normal_kl(
             true_mean, true_log_variance_clipped, out["mean"], out["log_variance"]
         )
-        kl = mean_flat(kl) / np.log(2.0)
+        kl = mean_flat(kl_full) / np.log(2.0)
 
         decoder_nll = -discretized_gaussian_log_likelihood(
             x_start, means=out["mean"], log_scales=0.5 * out["log_variance"]
@@ -676,8 +676,15 @@ class GaussianDiffusion:
         t = t[0].item()
         if t % 100 == 0:
             print('t', t)
-            print('true_log_variance_clipped', true_log_variance_clipped[0][0][0])
-            print('out["log_variance"]', out["log_variance"][0][0][0])
+            print('true_mean.shape', true_mean.shape)
+            print('true_log_variance_clipped.shape', true_log_variance_clipped.shape)
+            print('out["mean"].shape', out["mean"].shape)
+            print('out["log_variance"].shape', out["log_variance"].shape)
+            print("kl_full.shape", kl_full.shape)
+            print("MSE", th.mean(th.pow(true_mean - out["mean"], 2)))
+            print('true_log_variance_clipped[0,0,0,0]', true_log_variance_clipped[0,0,0,0])
+            print('out["log_variance"][0,0,0,0]', out["log_variance"][0,0,0,0])
+
         return {"output": output, "pred_xstart": out["pred_xstart"]}
 
     def training_losses(self, model, x_start, t, model_kwargs=None, noise=None):
