@@ -22,7 +22,7 @@ def download_checkpoints(run_id, step=-1, checkpoints=None):
 
     downloaded_checkpoints = []
     for checkpoint in checkpoints:
-        if step in checkpoint:
+        if str(step) in checkpoint:
             download_checkpoint(run_id, checkpoint)
             downloaded_checkpoints.append(checkpoint)
 
