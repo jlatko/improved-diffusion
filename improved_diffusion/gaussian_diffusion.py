@@ -672,7 +672,13 @@ class GaussianDiffusion:
         # At the first timestep return the decoder NLL,
         # otherwise return KL(q(x_{t-1}|x_t,x_0) || p(x_{t-1}|x_t))
         output = th.where((t == 0), decoder_nll, kl)
-        return {"output": output, "pred_xstart": out["pred_xstart"]}
+
+        t = t[0].item()
+        if t % 100 == 0:
+            print('t', t)
+            print('true_log_variance_clipped', true_log_variance_clipped)
+            print('out["log_variance"]', out["log_variance"])
+            return {"output": output, "pred_xstart": out["pred_xstart"]}
 
     def training_losses(self, model, x_start, t, model_kwargs=None, noise=None):
         """
@@ -809,6 +815,10 @@ class GaussianDiffusion:
             xstart_mse.append(mean_flat((out["pred_xstart"] - x_start) ** 2))
             eps = self._predict_eps_from_xstart(x_t, t_batch, out["pred_xstart"])
             mse.append(mean_flat((eps - noise) ** 2))
+            if t % 100 == 0:
+                print(t)
+                print('vb', out["output"])
+                print('mse', mse[-1])
 
         vb = th.stack(vb, dim=1)
         xstart_mse = th.stack(xstart_mse, dim=1)
