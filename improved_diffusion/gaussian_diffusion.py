@@ -327,7 +327,7 @@ class GaussianDiffusion:
 
     def _predict_xstart_from_eps(self, x_t, t, eps):
         assert x_t.shape == eps.shape
-        if t % 100 == 0:
+        if t[0].item() % 100 == 0:
             print('_predict_xstart_from_eps', t)
             print('sqrt_recip_alphas_cumprod', _extract_into_tensor(self.sqrt_recip_alphas_cumprod, t, x_t.shape))
             print('sqrt_recipm1_alphas_cumprod', _extract_into_tensor(self.sqrt_recipm1_alphas_cumprod, t, x_t.shape))
