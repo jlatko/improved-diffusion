@@ -92,6 +92,13 @@ def run_bpd_evaluation(model, diffusion, data, num_samples, clip_denoised):
         wandb.log({"mse": np.mean(minibatch_metrics["mse"].detach().cpu().numpy())})
         wandb.log({"xstart_mse": np.mean(minibatch_metrics["xstart_mse"].detach().cpu().numpy())})
 
+        print("bpd", total_bpd)
+        print("L_intermediate", np.mean(minibatch_metrics["vb"][:, :-1].sum(dim=1).detach().cpu().numpy()))
+        print("L_0", np.mean(minibatch_metrics["vb"][:, -1].detach().cpu().numpy()))
+        print("L_T", np.mean(minibatch_metrics["prior_bpd"].detach().cpu().numpy()))
+        print("mse", np.mean(minibatch_metrics["mse"].detach().cpu().numpy()))
+        print("xstart_mse", np.mean(minibatch_metrics["xstart_mse"].detach().cpu().numpy()))
+
         logger.log(f"done {num_complete} samples: bpd={np.mean(all_bpd)}")
 
     if dist.get_rank() == 0:
