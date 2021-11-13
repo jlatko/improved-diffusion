@@ -100,7 +100,16 @@ def run_bpd_evaluation(model, diffusion, data, num_samples, clip_denoised):
         print("mse", np.mean(minibatch_metrics["mse"].detach().cpu().numpy()))
         print("xstart_mse", np.mean(minibatch_metrics["xstart_mse"].detach().cpu().numpy()))
         print("means_mse", np.mean(minibatch_metrics["means_mse"].detach().cpu().numpy()))
+
         print("mse [:-1]", np.mean(minibatch_metrics["mse"][:, :-1].detach().cpu().numpy()))
+        print("mse [:200]", np.mean(minibatch_metrics["mse"][:, :200].detach().cpu().numpy()))
+        print("mse [200:400]", np.mean(minibatch_metrics["mse"][:, 200:400].detach().cpu().numpy()))
+        print("mse [400:600]", np.mean(minibatch_metrics["mse"][:, 400:600].detach().cpu().numpy()))
+        print("mse [600:800]", np.mean(minibatch_metrics["mse"][:, 600:800].detach().cpu().numpy()))
+        print("mse [800:-1]", np.mean(minibatch_metrics["mse"][:, 800:-1].detach().cpu().numpy()))
+
+
+
         print("xstart_mse [:-1]", np.mean(minibatch_metrics["xstart_mse"][:, :-1].detach().cpu().numpy()))
         print("means_mse [:-1]", np.mean(minibatch_metrics["means_mse"][:, :-1].detach().cpu().numpy()))
 
