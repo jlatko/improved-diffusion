@@ -168,6 +168,23 @@ class GaussianDiffusion:
             / (1.0 - self.alphas_cumprod)
         )
 
+        np.save("/scratch/s193223/debug_impr/betas.npy", np.array(self.betas))
+        np.save("/scratch/s193223/debug_impr/alphas.npy", np.array(alphas))
+        np.save("/scratch/s193223/debug_impr/alphas_hat.npy", np.array(self.alphas_cumprod))
+        np.save("/scratch/s193223/debug_impr/alphas_hat_sqrt.npy", np.array(self.sqrt_alphas_cumprod))
+        np.save("/scratch/s193223/debug_impr/one_min_alphas_hat_sqrt.npy", np.array(self.sqrt_one_minus_alphas_cumprod))
+        np.save("/scratch/s193223/debug_impr/alphas_hat_prev.npy", np.array(self.alphas_cumprod_prev))
+        np.save("/scratch/s193223/debug_impr/alphas_hat_next.npy", np.array(self.alphas_cumprod_next))
+        np.save("/scratch/s193223/debug_impr/posterior_variance.npy", np.array(self.posterior_variance))
+
+        np.save("/scratch/s193223/debug_impr/posterior_mean_coef1.npy", np.array(self.posterior_mean_coef1))
+        np.save("/scratch/s193223/debug_impr/posterior_mean_coef2.npy", np.array(self.posterior_mean_coef2))
+        np.save("/scratch/s193223/debug_impr/posterior_log_variance_clipped.npy", np.array(self.posterior_log_variance_clipped))
+
+        np.save("/scratch/s193223/debug_impr/log_one_minus_alphas_cumprod.npy", np.array(self.log_one_minus_alphas_cumprod))
+        np.save("/scratch/s193223/debug_impr/sqrt_recip_alphas_cumprod.npy", np.array(self.sqrt_recip_alphas_cumprod))
+        np.save("/scratch/s193223/debug_impr/sqrt_recipm1_alphas_cumprod.npy", np.array(self.sqrt_recipm1_alphas_cumprod))
+
     def q_mean_variance(self, x_start, t):
         """
         Get the distribution q(x_t | x_0).
@@ -687,7 +704,7 @@ class GaussianDiffusion:
         #     print('true_log_variance_clipped[0,0,0,0]', true_log_variance_clipped[0,0,0,0])
         #     print('out["log_variance"][0,0,0,0]', out["log_variance"][0,0,0,0])
 
-        return {"output": output, "pred_xstart": out["pred_xstart"], "mse_means": mse_means}
+        return {"output": output, "pred_xstart": out["pred_xstart"], "mse_means": mse_means, "pred_mean": out['mean']}
 
     def training_losses(self, model, x_start, t, model_kwargs=None, noise=None):
         """
@@ -826,6 +843,7 @@ class GaussianDiffusion:
             means_mse.append(out["mse_means"])
             eps = self._predict_eps_from_xstart(x_t, t_batch, out["pred_xstart"])
             mse.append(mean_flat((eps - noise) ** 2))
+
             # if t % 100 == 0:
             #     print(t)
             #     print('vb', out["output"])
