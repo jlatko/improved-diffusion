@@ -669,7 +669,7 @@ class GaussianDiffusion:
         assert decoder_nll.shape == x_start.shape
         decoder_nll = mean_flat(decoder_nll) / np.log(2.0)
 
-        mse_means = mean_flat((true_mean - true_log_variance_clipped) ** 2)
+        mse_means = mean_flat((true_mean - out["mean"]) ** 2)
 
         # At the first timestep return the decoder NLL,
         # otherwise return KL(q(x_{t-1}|x_t,x_0) || p(x_{t-1}|x_t))
