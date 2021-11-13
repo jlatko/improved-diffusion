@@ -327,10 +327,6 @@ class GaussianDiffusion:
 
     def _predict_xstart_from_eps(self, x_t, t, eps):
         assert x_t.shape == eps.shape
-        if t[0].item() % 100 == 0:
-            print('_predict_xstart_from_eps', t)
-            print('sqrt_recip_alphas_cumprod', _extract_into_tensor(self.sqrt_recip_alphas_cumprod, t, x_t.shape))
-            print('sqrt_recipm1_alphas_cumprod', _extract_into_tensor(self.sqrt_recipm1_alphas_cumprod, t, x_t.shape))
         return (
             _extract_into_tensor(self.sqrt_recip_alphas_cumprod, t, x_t.shape) * x_t
             - _extract_into_tensor(self.sqrt_recipm1_alphas_cumprod, t, x_t.shape) * eps
@@ -678,16 +674,16 @@ class GaussianDiffusion:
         output = th.where((t == 0), decoder_nll, kl)
 
         t = t[0].item()
-        if t % 100 == 0:
-            print('t', t)
-            print('true_mean.shape', true_mean.shape)
-            print('true_log_variance_clipped.shape', true_log_variance_clipped.shape)
-            print('out["mean"].shape', out["mean"].shape)
-            print('out["log_variance"].shape', out["log_variance"].shape)
-            print("kl_full.shape", kl_full.shape)
-            print("MSE", th.mean(th.pow(true_mean - out["mean"], 2)))
-            print('true_log_variance_clipped[0,0,0,0]', true_log_variance_clipped[0,0,0,0])
-            print('out["log_variance"][0,0,0,0]', out["log_variance"][0,0,0,0])
+        # if t % 100 == 0:
+        #     print('t', t)
+        #     print('true_mean.shape', true_mean.shape)
+        #     print('true_log_variance_clipped.shape', true_log_variance_clipped.shape)
+        #     print('out["mean"].shape', out["mean"].shape)
+        #     print('out["log_variance"].shape', out["log_variance"].shape)
+        #     print("kl_full.shape", kl_full.shape)
+        #     print("MSE", th.mean(th.pow(true_mean - out["mean"], 2)))
+        #     print('true_log_variance_clipped[0,0,0,0]', true_log_variance_clipped[0,0,0,0])
+        #     print('out["log_variance"][0,0,0,0]', out["log_variance"][0,0,0,0])
 
         return {"output": output, "pred_xstart": out["pred_xstart"]}
 
@@ -826,10 +822,10 @@ class GaussianDiffusion:
             xstart_mse.append(mean_flat((out["pred_xstart"] - x_start) ** 2))
             eps = self._predict_eps_from_xstart(x_t, t_batch, out["pred_xstart"])
             mse.append(mean_flat((eps - noise) ** 2))
-            if t % 100 == 0:
-                print(t)
-                print('vb', out["output"])
-                print('mse', mse[-1])
+            # if t % 100 == 0:
+            #     print(t)
+            #     print('vb', out["output"])
+            #     print('mse', mse[-1])
 
         vb = th.stack(vb, dim=1)
         xstart_mse = th.stack(xstart_mse, dim=1)
