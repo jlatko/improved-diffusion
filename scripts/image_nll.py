@@ -73,7 +73,6 @@ def run_bpd_evaluation(model, diffusion, data, num_samples, clip_denoised):
         minibatch_metrics = diffusion.calc_bpd_loop(
             model, batch, clip_denoised=clip_denoised, model_kwargs=model_kwargs
         )
-        print(minibatch_metrics)
 
         for key, term_list in all_metrics.items():
             terms = minibatch_metrics[key].mean(dim=0) / dist.get_world_size()
@@ -86,6 +85,10 @@ def run_bpd_evaluation(model, diffusion, data, num_samples, clip_denoised):
         dist.all_reduce(total_bpd)
         all_bpd.append(total_bpd.item())
         num_complete += dist.get_world_size() * batch.shape[0]
+        wandb.log({"bpd": total_bpd})
+        wandb.log({"L_intermediate": np.mean(minibatch_metrics["vb"][:,:-1].sum(dim=1).detach().cpu().numpy())})
+        wandb.log({"L_0": np.mean(minibatch_metrics["vb"][:,-1].detach().cpu().numpy())})
+        wandb.log({"L_T": np.mean(minibatch_metrics["prior_bpd"].detach().cpu().numpy())})
 
         logger.log(f"done {num_complete} samples: bpd={np.mean(all_bpd)}")
 
