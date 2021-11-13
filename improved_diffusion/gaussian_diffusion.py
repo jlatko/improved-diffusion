@@ -669,6 +669,8 @@ class GaussianDiffusion:
         assert decoder_nll.shape == x_start.shape
         decoder_nll = mean_flat(decoder_nll) / np.log(2.0)
 
+        mse_means = mean_flat((true_mean - true_log_variance_clipped) ** 2)
+
         # At the first timestep return the decoder NLL,
         # otherwise return KL(q(x_{t-1}|x_t,x_0) || p(x_{t-1}|x_t))
         output = th.where((t == 0), decoder_nll, kl)
@@ -685,7 +687,7 @@ class GaussianDiffusion:
         #     print('true_log_variance_clipped[0,0,0,0]', true_log_variance_clipped[0,0,0,0])
         #     print('out["log_variance"][0,0,0,0]', out["log_variance"][0,0,0,0])
 
-        return {"output": output, "pred_xstart": out["pred_xstart"]}
+        return {"output": output, "pred_xstart": out["pred_xstart"], "mse_means": mse_means}
 
     def training_losses(self, model, x_start, t, model_kwargs=None, noise=None):
         """
@@ -803,6 +805,7 @@ class GaussianDiffusion:
 
         vb = []
         xstart_mse = []
+        means_mse = []
         mse = []
         for t in list(range(self.num_timesteps))[::-1]:
             t_batch = th.tensor([t] * batch_size, device=device)
@@ -820,6 +823,7 @@ class GaussianDiffusion:
                 )
             vb.append(out["output"])
             xstart_mse.append(mean_flat((out["pred_xstart"] - x_start) ** 2))
+            means_mse.append(out["mse_means"])
             eps = self._predict_eps_from_xstart(x_t, t_batch, out["pred_xstart"])
             mse.append(mean_flat((eps - noise) ** 2))
             # if t % 100 == 0:
@@ -829,6 +833,7 @@ class GaussianDiffusion:
 
         vb = th.stack(vb, dim=1)
         xstart_mse = th.stack(xstart_mse, dim=1)
+        means_mse = th.stack(means_mse, dim=1)
         mse = th.stack(mse, dim=1)
 
         prior_bpd = self._prior_bpd(x_start)
@@ -838,6 +843,7 @@ class GaussianDiffusion:
             "prior_bpd": prior_bpd,
             "vb": vb,
             "xstart_mse": xstart_mse,
+            "means_mse": means_mse,
             "mse": mse,
         }
 
