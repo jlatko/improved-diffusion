@@ -104,6 +104,8 @@ def run_bpd_evaluation(model, diffusion, data, num_samples, clip_denoised):
         print("xstart_mse [:-1]", np.mean(minibatch_metrics["xstart_mse"][:, :-1].detach().cpu().numpy()))
         print("means_mse [:-1]", np.mean(minibatch_metrics["means_mse"][:, :-1].detach().cpu().numpy()))
 
+        print(np.mean(minibatch_metrics["vb"][:, :-1].detach().cpu().numpy(), axis=0))
+
         logger.log(f"done {num_complete} samples: bpd={np.mean(all_bpd)}")
 
     if dist.get_rank() == 0:
