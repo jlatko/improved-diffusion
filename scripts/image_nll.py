@@ -98,6 +98,8 @@ def run_bpd_evaluation(model, diffusion, data, num_samples, clip_denoised):
         print("L_T", np.mean(minibatch_metrics["prior_bpd"].detach().cpu().numpy()))
         print("mse", np.mean(minibatch_metrics["mse"].detach().cpu().numpy()))
         print("xstart_mse", np.mean(minibatch_metrics["xstart_mse"].detach().cpu().numpy()))
+        print("mse [:-1]", np.mean(minibatch_metrics["mse"][:, :-1].detach().cpu().numpy()))
+        print("xstart_mse [:-1]", np.mean(minibatch_metrics["xstart_mse"][:, :-1].detach().cpu().numpy()))
 
         logger.log(f"done {num_complete} samples: bpd={np.mean(all_bpd)}")
 
